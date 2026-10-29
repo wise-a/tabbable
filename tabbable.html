@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    /*!
+ * tabbable — styles.css
+ * Privacy-Conscious, Responsive New Tab Dashboard
+ *
+ * Font Licensing & Attribution:
+ * Optional remote typeface "Inter" designed by Rasmus Andersson.
+ * Licensed under the SIL Open Font License, Version 1.1 (https://openfontlicense.org).
+ * Served optionally via Bunny Fonts (https://fonts.bunny.net), a zero-tracking font CDN.
+ * If blocked, offline, or unavailable, rendering falls back immediately to native system sans-serif fonts.
+ */
+
+/* ==========================================================================
+   0. Optional Remote Font Declarations (Non-Blocking Progressive Enhancement)
+   ========================================================================== */
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("Inter"),
+       local("Inter-Regular"),
+       url("https://fonts.bunny.net/inter/files/inter-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local("Inter Medium"),
+       local("Inter-Medium"),
+       url("https://fonts.bunny.net/inter/files/inter-latin-500-normal.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local("Inter SemiBold"),
+       local("Inter-SemiBold"),
+       url("https://fonts.bunny.net/inter/files/inter-latin-600-normal.woff2") format("woff2");
+}
+
+/* ==========================================================================
+   1. Global Variables & Design System Tokens
+   ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* Light Mode Palette (Default Fallback) */
+  --bg-page: #f8f9fa;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f1f4f8;
+  --bg-surface-active: #e7ecf2;
+  --bg-surface-offline: #f3f5f7;
+  --bg-status: #eef1f5;
+
+  /* Text Colors (WCAG AA+ Verified Against Page & Surface Backgrounds) */
+  --text-primary: #1e242b;
+  --text-secondary: #4f5965;
+  --text-muted: #5f6b7a;
+
+  /* Borders & Interactive Outlines */
+  --border-subtle: #dce1e7;
+  --border-hover: #aeb8c4;
+  --border-offline: #c8d0d9;
+  --focus-ring: #1e242b;
+  --focus-offset: 3px;
+
+  /* Subtle CSS-Generated Offline Texture Token */
+  --offline-pattern-dot: rgba(30, 36, 43, 0.07);
+  --offline-pattern-size: 18px;
+
+  /* Typography & Font Weights */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Fluid Type Scale */
+  --font-size-clock: clamp(3.25rem, 7vw + 1rem, 5.5rem);
+  --font-size-greeting: clamp(1.0625rem, 1vw + 0.85rem, 1.25rem);
+  --font-size-meta: clamp(0.9375rem, 0.4vw + 0.85rem, 1.0625rem);
+  --font-size-card: 0.9375rem;
+  --font-size-status: 0.8125rem;
+
+  /* Line Heights & Letter Spacing */
+  --line-height-tight: 1.08;
+  --line-height-snug: 1.35;
+  --line-height-base: 1.5;
+  --tracking-clock: -0.035em;
+  --tracking-normal: -0.005em;
+
+  /* Spacing & Sizing Scale */
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 3.5rem;
+
+  /* Layout Dimensions & Touch Targets */
+  --container-max-width: 64rem;
+  --grid-min-card-width: 11.5rem;
+  --card-min-height: 3.5rem;
+
+  /* Border Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-pill: 9999px;
+
+  /* Transitions & Motion */
+  --duration-fast: 140ms;
+  --duration-normal: 220ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Automatic Dark Mode via Browser / OS Preference */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-page: #141619;
+    --bg-surface: #1d2025;
+    --bg-surface-hover: #262a31;
+    --bg-surface-active: #2e333c;
+    --bg-surface-offline: #181b20;
+    --bg-status: #20242b;
+
+    --text-primary: #eceff3;
+    --text-secondary: #a0aab6;
+    --text-muted: #8a95a3;
+
+    --border-subtle: #2d333b;
+    --border-hover: #4c5664;
+    --border-offline: #323943;
+    --focus-ring: #eceff3;
+
+    --offline-pattern-dot: rgba(236, 239, 243, 0.055);
+  }
+}
+
+/* ==========================================================================
+   2. Typography
+   ========================================================================== */
+
+html {
+  font-family: var(--font-sans);
+  font-size: 100%;
+  line-height: var(--line-height-base);
+  letter-spacing: var(--tracking-normal);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ==========================================================================
+   3. Base Styles
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body,
+.page-body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-weight: var(--font-weight-regular);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition:
+    background-color var(--duration-normal) var(--ease-standard),
+    color var(--duration-normal) var(--ease-standard);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ==========================================================================
+   4. Page Layout
+   ========================================================================== */
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  padding-block: var(--space-2xl);
+  padding-inline: var(--space-lg);
+}
+
+/*
+ * margin-block: auto centers the dashboard vertically when viewport height allows,
+ * while collapsing cleanly to 0 when content exceeds viewport height so top content never clips.
+ */
+.dashboard-container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+  margin-block: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* ==========================================================================
+   5. Clock, Date, Greeting, and Metadata
+   ========================================================================== */
+
+.dashboard-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-sm);
+}
+
+.clock-display {
+  display: block;
+  margin: 0;
+  font-size: var(--font-size-clock);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--tracking-clock);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.metadata-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  column-gap: var(--space-sm);
+  row-gap: var(--space-2xs);
+  font-size: var(--font-size-meta);
+  color: var(--text-secondary);
+}
+
+.date-display {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+}
+
+.metadata-divider {
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.greeting-text {
+  margin: var(--space-2xs) 0 0;
+  max-width: 42ch;
+  font-size: var(--font-size-greeting);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-snug);
+  color: var(--text-secondary);
+  overflow-wrap: break-word;
+}
+
+/* Weather Widget Base */
+.weather-widget {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-2xs);
+  color: var(--text-secondary);
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+
+.weather-label {
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-context {
+  font-size: 0.92em;
+  font-weight: var(--font-weight-regular);
+  color: var(--text-muted);
+}
+
+.weather-context:empty {
+  display: none;
+}
+
+/* ==========================================================================
+   6. Shortcuts
+   ========================================================================== */
+
+.shortcuts-section {
+  width: 100%;
+}
+
+.shortcuts-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, var(--grid-min-card-width)), 1fr)
+  );
+  gap: var(--space-md);
+}
+
+.shortcut-item {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  min-width: 0;
+}
+
+.shortcut-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: var(--card-min-height);
+  padding: var(--space-md) var(--space-lg);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard);
+}
+
+.shortcut-card:hover {
+  background-color: var(--bg-surface-hover);
+  border-color: var(--border-hover);
+}
+
+.shortcut-card:active {
+  background-color: var(--bg-surface-active);
+}
+
+.shortcut-label {
+  display: block;
+  max-width: 100%;
+  font-size: var(--font-size-card);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-wrap: balance;
+}
+
+/* ==========================================================================
+   7. Availability & Connectivity States
+   ========================================================================== */
+
+/* State A: Connected (Normal Background & Full Visual Emphasis) */
+.page-body.is-online {
+  background-image: none;
+}
+
+.weather-widget--available {
+  color: var(--text-secondary);
+}
+
+.weather-widget--available .weather-label {
+  color: var(--text-primary);
+}
+
+/*
+ * State B: Connected with Unavailable Services
+ * Only the affected weather component is visually muted; shortcuts and background stay normal.
+ * Paired with explicit status wording in HTML/JS so state never relies on color alone.
+ */
+.weather-widget--loading,
+.weather-widget--unavailable,
+.weather-widget--location-unavailable,
+.weather-widget--service-unavailable,
+.weather-widget--offline {
+  color: var(--text-muted);
+}
+
+.weather-widget--unavailable .weather-label,
+.weather-widget--location-unavailable .weather-label,
+.weather-widget--service-unavailable .weather-label,
+.weather-widget--offline .weather-label {
+  font-weight: var(--font-weight-regular);
+  border-bottom: 1px dashed var(--border-offline);
+  padding-bottom: 1px;
+}
+
+.weather-widget--loading .weather-label {
+  font-weight: var(--font-weight-regular);
+}
+
+/*
+ * State C: Offline
+ * Applies a restrained, CSS-generated dot matrix texture without external assets,
+ * displays the status notice, and mutes remote shortcuts while preserving legibility.
+ */
+.page-body.is-offline {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    var(--offline-pattern-dot) 1px,
+    transparent 0
+  );
+  background-size: var(--offline-pattern-size) var(--offline-pattern-size);
+}
+
+.connectivity-status {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-xs);
+  padding: var(--space-2xs) var(--space-md);
+  background-color: var(--bg-status);
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-offline);
+  border-radius: var(--radius-pill);
+  max-width: 100%;
+}
+
+.connectivity-status--visible {
+  display: inline-flex;
+}
+
+.page-body.is-offline .connectivity-status:not([hidden]) {
+  display: inline-flex;
+}
+
+.connectivity-message {
+  font-size: var(--font-size-status);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+}
+
+/* Offline Shortcut Treatment (Structural Dashed Border + Accessible Muted Contrast) */
+.page-body.is-offline .shortcut-card,
+.shortcut-card--offline {
+  background-color: var(--bg-surface-offline);
+  color: var(--text-muted);
+  border-color: var(--border-offline);
+  border-style: dashed;
+}
+
+.page-body.is-offline .shortcut-card:hover,
+.shortcut-card--offline:hover {
+  background-color: var(--bg-surface-offline);
+  border-color: var(--border-offline);
+}
+
+.shortcut-card--offline[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   8. Responsive Behavior
+   ========================================================================== */
+
+/* Narrow Portrait Phones */
+@media (max-width: 35.99rem) {
+  :root {
+    --grid-min-card-width: 9.25rem;
+  }
+
+  .dashboard {
+    padding-block: var(--space-xl);
+    padding-inline: var(--space-md);
+  }
+
+  .dashboard-container {
+    gap: var(--space-lg);
+  }
+
+  .shortcuts-grid {
+    gap: var(--space-sm);
+  }
+
+  .shortcut-card {
+    padding: var(--space-sm) var(--space-md);
+  }
+}
+
+/* Ultra-Narrow Viewports: Single-Column Graceful Fallback */
+@media (max-width: 22.5rem) {
+  .shortcuts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metadata-divider {
+    display: none;
+  }
+
+  .metadata-bar {
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+}
+
+/* Compact Landscape Phones */
+@media (max-height: 32rem) and (orientation: landscape) {
+  :root {
+    --font-size-clock: clamp(2.25rem, 6vw, 3.25rem);
+  }
+
+  .dashboard {
+    padding-block: var(--space-lg);
+  }
+
+  .dashboard-container {
+    gap: var(--space-md);
+  }
+}
+
+/* Large Desktop Monitors */
+@media (min-width: 75rem) {
+  :root {
+    --grid-min-card-width: 12.5rem;
+  }
+
+  .shortcuts-grid {
+    gap: var(--space-lg);
+  }
+}
+
+/* ==========================================================================
+   9. Accessibility & High Contrast Resilience
+   ========================================================================== */
+
+/* Off-screen Keyboard Skip Link */
+.skip-link {
+  position: fixed;
+  top: var(--space-md);
+  left: var(--space-md);
+  z-index: 100;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border: 2px solid var(--focus-ring);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-card);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* Screen-Reader-Only Structural Utility */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Visible Keyboard Focus Indicators */
+.shortcut-card:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: var(--focus-offset);
+  border-color: var(--focus-ring);
+}
+
+/* Enhanced Contrast Preference */
+@media (prefers-contrast: more) {
+  :root {
+    --border-subtle: currentColor;
+    --border-offline: currentColor;
+    --text-secondary: var(--text-primary);
+  }
+
+  .shortcut-card {
+    border-width: 2px;
+  }
+}
+
+/* Windows High Contrast / Forced Colors Mode */
+@media (forced-colors: active) {
+  .page-body.is-offline {
+    background-image: none;
+  }
+
+  .shortcut-card {
+    border: 1px solid ButtonText;
+  }
+
+  .shortcut-card:hover,
+  .shortcut-card:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .page-body.is-offline .shortcut-card,
+  .shortcut-card--offline {
+    border-style: dashed;
+    color: GrayText;
+    border-color: GrayText;
+  }
+}
+
+/* ==========================================================================
+   10. Motion Preferences
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Inform the browser that both light and dark system color schemes are natively supported -->
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="tabbable — Privacy-conscious, minimalist New Tab personal dashboard.">
+  <!-- Prevent referrer leakage when navigating to external shortcut destinations -->
+  <meta name="referrer" content="no-referrer">
+
+  <title>New Tab — tabbable</title>
+
+  <!-- =====================================================================
+       OPTIONAL REMOTE FONT (PRIVACY-CONSCIOUS FALLBACK)
+       - Provider: Bunny Fonts (zero-tracking, GDPR-compliant font CDN).
+       - Font: Inter by Rasmus Andersson, licensed under the SIL Open Font
+         License 1.1 (https://openfontlicense.org/).
+       - Data Sent: Standard HTTP request headers (IP address, User-Agent)
+         to fonts.bunny.net if the browser fetches the stylesheet/font files.
+       - Resilience: Uses font-display: swap. If blocked, offline, or
+         removed, the page renders immediately using native system fonts.
+       - To disable all remote font requests, simply delete the <link> below.
+       ===================================================================== -->
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap">
+
+  <!-- =====================================================================
+       STYLESHEET PLACEHOLDER
+       - During modular development, link to styles.css.
+       - For single-file distribution, replace this <link> with an embedded
+         <style>...</style> block containing styles.css.
+       ===================================================================== -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="page-body">
+  <!-- Keyboard accessibility: allows keyboard users to jump directly to shortcuts -->
+  <a class="skip-link" href="#shortcuts-section">Skip to shortcuts</a>
+
+  <main class="dashboard" id="dashboard">
+    <div class="dashboard-container">
+
+      <!-- =================================================================
+           HEADER: PROMINENT CLOCK, METADATA BAR, GREETING & OFFLINE NOTICE
+           - Renders sensible static fallbacks when JavaScript is disabled.
+           - Progressively enhanced by local JavaScript at runtime.
+           ================================================================= -->
+      <header class="dashboard-header">
+        <!-- Prominent Digital Clock (Offline-capable via local device clock) -->
+        <time
+          class="clock-display"
+          id="clock-display"
+          aria-label="Current local time"
+        >--:--</time>
+
+        <!-- Compact Line of Date and Optional Live Weather -->
+        <div class="metadata-bar">
+          <time
+            class="date-display"
+            id="date-display"
+          >Local clock &amp; date require JavaScript</time>
+
+          <span class="metadata-divider" aria-hidden="true">&bull;</span>
+
+          <!-- Weather Status Component (Defaults to muted unavailable state without JS) -->
+          <div
+            class="weather-widget weather-widget--unavailable"
+            id="weather-widget"
+            role="status"
+            aria-live="polite"
+          >
+            <span class="weather-label" id="weather-label">Weather unavailable</span>
+            <span class="weather-context" id="weather-context" hidden></span>
+          </div>
+        </div>
+
+        <!-- Static, Customizable Greeting (Editable directly here in HTML) -->
+        <p class="greeting-text" id="greeting-text">
+          Good day. Ready when you are.
+        </p>
+
+        <!-- Connectivity Notice (Hidden by default; shown only when device reports offline) -->
+        <div
+          class="connectivity-status"
+          id="connectivity-status"
+          role="status"
+          aria-live="polite"
+          hidden
+        >
+          <span class="connectivity-message" id="connectivity-message">
+            Offline — online navigation and live weather may be unavailable.
+          </span>
+        </div>
+      </header>
+
+      <!-- =================================================================
+           SHORTCUT COLLECTION (CUSTOMIZE YOUR LINKS HERE)
+           How to customize your shortcuts:
+           1. EDIT A SHORTCUT:
+              - Change the `href="..."` attribute on `<a class="shortcut-card">`
+                to update the Destination URL.
+              - Change the text inside `<span class="shortcut-label">...</span>`
+                to update the Display Label.
+           2. ADD OR DUPLICATE A SHORTCUT:
+              - Copy an entire `<li class="shortcut-item">...</li>` block and
+                paste it anywhere inside `<ul class="shortcuts-grid">` below.
+           3. REORDER SHORTCUTS:
+              - Cut and paste `<li class="shortcut-item">...</li>` blocks into
+                your preferred order.
+           4. REMOVE A SHORTCUT:
+              - Delete the entire `<li class="shortcut-item">...</li>` block.
+           Note: There is no limit on the number of shortcuts or label length.
+           ================================================================= -->
+      <nav class="shortcuts-section" id="shortcuts-section" aria-label="Saved shortcuts">
+        <h2 class="visually-hidden">Shortcuts</h2>
+
+        <ul class="shortcuts-grid" id="shortcuts-grid">
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://mail.proton.me/">
+              <span class="shortcut-label">Proton Mail</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://calendar.proton.me/">
+              <span class="shortcut-label">Calendar</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://github.com/">
+              <span class="shortcut-label">GitHub</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://developer.mozilla.org/">
+              <span class="shortcut-label">MDN Web Docs</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://en.wikipedia.org/">
+              <span class="shortcut-label">Wikipedia</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://news.ycombinator.com/">
+              <span class="shortcut-label">Hacker News</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://arstechnica.com/">
+              <span class="shortcut-label">Ars Technica</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://standardebooks.org/">
+              <span class="shortcut-label">Standard Ebooks</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://openstreetmap.org/">
+              <span class="shortcut-label">OpenStreetMap</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://archive.org/">
+              <span class="shortcut-label">Internet Archive &amp; Wayback Machine</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://lobste.rs/">
+              <span class="shortcut-label">Lobsters</span>
+            </a>
+          </li>
+
+          <li class="shortcut-item">
+            <a class="shortcut-card" href="https://duckduckgo.com/">
+              <span class="shortcut-label">DuckDuckGo Search</span>
+            </a>
+          </li>
+
+        </ul>
+      </nav>
+
+    </div>
+  </main>
+
+  <!-- =====================================================================
+       PROGRESSIVE ENHANCEMENT JAVASCRIPT
+       External Services & Privacy Disclosure:
+       1. Clock, Date & Greeting: 100% local using the device's system clock.
+          Zero network requests, cookies, or persistent storage.
+       2. Browser Geolocation (Step 1, optional): Permission-gated by the
+          browser (`navigator.geolocation`). Coordinates are held strictly in
+          ephemeral memory for the current tab session and sent only to the
+          configured weather API. Denials are respected for the session.
+       3. IP Geolocation Fallback (Step 2, optional): Uses GeoJS
+          (`https://get.geojs.io/v1/ip/geo.json`) ONLY when browser geolocation
+          is denied or unavailable and `enableIpFallback` is true. Note: IP
+          estimation is NOT controlled by browser geolocation permissions; it
+          sends a standard HTTPS request revealing your public IP address to
+          estimate city/region. VPNs, relays, and proxies may yield inaccurate
+          locations, so results are explicitly labeled "(approx.)".
+       4. Weather Retrieval (optional): Uses Open-Meteo
+          (`https://api.open-meteo.com/v1/forecast`), an open-source weather
+          service requiring no API key for non-commercial personal use.
+          Receives rounded coordinates (2 decimal places, ~1.1 km precision)
+          and standard HTTP request headers.
+       ===================================================================== -->
+  <script>
+    (function () {
+      'use strict';
+
+      /* -------------------------------------------------------------------
+         1. USER CONFIGURATION
+         Edit the settings below to customize time format, dynamic greetings,
+         or optional weather and location behavior.
+         ------------------------------------------------------------------- */
+      const CONFIG = {
+        clock: {
+          // Set to true for 24-hour time ("14:30"), false for 12-hour ("2:30 PM"),
+          // or null to follow the browser's default locale preference.
+          hour12: null
+        },
+        greeting: {
+          // Keep false to preserve the hardcoded greeting in HTML.
+          // Set to true to automatically display "Good morning.", "Good afternoon.",
+          // or "Good evening." based on local device time.
+          useTimeOfDay: false
+        },
+        connectivity: {
+          // When the browser explicitly reports offline status, prevent futile clicks
+          // on remote http/https shortcuts while keeping local/internal links active.
+          preventOfflineRemoteNavigation: true,
+          defaultOfflineMessage: 'Offline — online navigation and live weather may be unavailable.',
+          blockedClickMessage: 'Device is offline — cannot open remote shortcut until connection returns.'
+        },
+        weather: {
+          // Master toggle: set to false to completely disable location & weather requests.
+          enabled: true,
+          // Optional fallback when browser geolocation is denied or unavailable.
+          // Set to false to never contact the IP-geolocation service.
+          enableIpFallback: true,
+          // Manual coordinate override: set `{ latitude: 37.41, longitude: -79.14, label: 'Lynchburg' }`
+          // to skip both browser geolocation and IP estimation entirely.
+          manualLocation: null,
+          // 'auto' (infers from browser locale), 'fahrenheit', or 'celsius'
+          temperatureUnit: 'auto',
+          // Documented, keyless endpoints
+          weatherEndpoint: 'https://api.open-meteo.com/v1/forecast',
+          ipGeoEndpoint: 'https://get.geojs.io/v1/ip/geo.json',
+          // Timeouts & restrained refresh cadence (milliseconds)
+          geolocationTimeoutMs: 8000,
+          requestTimeoutMs: 7000,
+          refreshIntervalMs: 30 * 60 * 1000, // 30 minutes
+          minRetryCooldownMs: 15 * 1000      // 15 seconds minimum between network attempts
+        }
+      };
+
+      /* -------------------------------------------------------------------
+         2. DOM REFERENCES & IN-MEMORY SESSION STATE
+         No cookies, localStorage, or sessionStorage are used.
+         ------------------------------------------------------------------- */
+      const dom = {
+        body: document.body,
+        clock: document.getElementById('clock-display'),
+        date: document.getElementById('date-display'),
+        greeting: document.getElementById('greeting-text'),
+        weatherWidget: document.getElementById('weather-widget'),
+        weatherLabel: document.getElementById('weather-label'),
+        weatherContext: document.getElementById('weather-context'),
+        connectivityBox: document.getElementById('connectivity-status'),
+        connectivityMsg: document.getElementById('connectivity-message'),
+        shortcutsGrid: document.getElementById('shortcuts-grid')
+      };
+
+      const state = {
+        isOffline: false,
+        clockTimerId: null,
+        weatherTimerId: null,
+        // Ephemeral session memory so we never re-prompt after permission denial
+        geoPermissionDenied: false,
+        geoBrowserAttempted: false,
+        // Preserves resolved location even if the weather API later fails
+        resolvedLocation: null, // { latitude, longitude, label, isApproximate }
+        lastWeatherData: null,  // { temp, unitSymbol, description, updatedText }
+        lastFetchAttemptAt: 0,
+        lastWeatherSuccessAt: 0,
+        isFetchingWeather: false
+      };
+
+      const WEATHER_MODIFIER_CLASSES = [
+        'weather-widget--unavailable',
+        'weather-widget--loading',
+        'weather-widget--available',
+        'weather-widget--location-unavailable',
+        'weather-widget--service-unavailable',
+        'weather-widget--offline'
+      ];
+
+      // Standard Open-Meteo WMO Weather interpretation codes (WW)
+      const WMO_DESCRIPTIONS = {
+        0: 'Clear',
+        1: 'Mostly clear',
+        2: 'Partly cloudy',
+        3: 'Overcast',
+        45: 'Fog',
+        48: 'Rime fog',
+        51: 'Light drizzle',
+        53: 'Drizzle',
+        55: 'Heavy drizzle',
+        56: 'Freezing drizzle',
+        57: 'Freezing drizzle',
+        61: 'Light rain',
+        63: 'Rain',
+        65: 'Heavy rain',
+        66: 'Freezing rain',
+        67: 'Freezing rain',
+        71: 'Light snow',
+        73: 'Snow',
+        75: 'Heavy snow',
+        77: 'Snow grains',
+        80: 'Rain showers',
+        81: 'Rain showers',
+        82: 'Heavy showers',
+        85: 'Snow showers',
+        86: 'Snow showers',
+        95: 'Thunderstorm',
+        96: 'Thunderstorm',
+        99: 'Severe thunderstorm'
+      };
+
+      /* -------------------------------------------------------------------
+         3. LOCAL CLOCK, DATE & OPTIONAL GREETING
+         Operates completely offline using native Intl formatting.
+         ------------------------------------------------------------------- */
+      function padTwoDigits(num) {
+        return String(num).padStart(2, '0');
+      }
+
+      function formatClockTime(now) {
+        try {
+          const options = { hour: 'numeric', minute: '2-digit' };
+          if (typeof CONFIG.clock.hour12 === 'boolean') {
+            options.hour12 = CONFIG.clock.hour12;
+          }
+          return new Intl.DateTimeFormat(undefined, options).format(now);
+        } catch (err) {
+          return padTwoDigits(now.getHours()) + ':' + padTwoDigits(now.getMinutes());
+        }
+      }
+
+      function formatLocalDate(now) {
+        try {
+          return new Intl.DateTimeFormat(undefined, {
+            weekday: 'long',
+            month: 'long',
+            day: 'numeric'
+          }).format(now);
+        } catch (err) {
+          return now.toDateString();
+        }
+      }
+
+      function getTimeBasedGreeting(hours) {
+        if (hours < 5) return 'Good evening. Quiet hours.';
+        if (hours < 12) return 'Good morning. Ready when you are.';
+        if (hours < 18) return 'Good afternoon. Ready when you are.';
+        return 'Good evening. Ready when you are.';
+      }
+
+      function updateClockAndDate() {
+        const now = new Date();
+
+        if (dom.clock) {
+          dom.clock.textContent = formatClockTime(now);
+          dom.clock.setAttribute(
+            'datetime',
+            padTwoDigits(now.getHours()) + ':' + padTwoDigits(now.getMinutes())
+          );
+        }
+
+        if (dom.date) {
+          dom.date.textContent = formatLocalDate(now);
+          const isoDate =
+            now.getFullYear() + '-' +
+            padTwoDigits(now.getMonth() + 1) + '-' +
+            padTwoDigits(now.getDate());
+          dom.date.setAttribute('datetime', isoDate);
+        }
+
+        if (CONFIG.greeting.useTimeOfDay && dom.greeting) {
+          dom.greeting.textContent = getTimeBasedGreeting(now.getHours());
+        }
+      }
+
+      function scheduleNextClockTick() {
+        if (state.clockTimerId !== null) {
+          window.clearTimeout(state.clockTimerId);
+        }
+        updateClockAndDate();
+        // Align next tick precisely to the upcoming minute boundary (+50ms buffer)
+        const now = new Date();
+        const msUntilNextMinute =
+          (60 - now.getSeconds()) * 1000 - now.getMilliseconds() + 50;
+        state.clockTimerId = window.setTimeout(
+          scheduleNextClockTick,
+          Math.max(1000, msUntilNextMinute)
+        );
+      }
+
+      /* -------------------------------------------------------------------
+         4. WEATHER UI PRESENTATION HELPERS
+         Communicates status via clear text labels as well as CSS state classes.
+         ------------------------------------------------------------------- */
+      function setWeatherPresentation(modifierClass, labelText, contextText, tooltipText) {
+        if (!dom.weatherWidget || !dom.weatherLabel) return;
+
+        WEATHER_MODIFIER_CLASSES.forEach(function (cls) {
+          dom.weatherWidget.classList.remove(cls);
+        });
+        dom.weatherWidget.classList.add(modifierClass);
+
+        dom.weatherLabel.textContent = labelText;
+
+        if (dom.weatherContext) {
+          if (contextText) {
+            dom.weatherContext.textContent = ' \u00B7 ' + contextText;
+            dom.weatherContext.hidden = false;
+          } else {
+            dom.weatherContext.textContent = '';
+            dom.weatherContext.hidden = true;
+          }
+        }
+
+        if (tooltipText) {
+          dom.weatherWidget.setAttribute('title', tooltipText);
+        } else {
+          dom.weatherWidget.removeAttribute('title');
+        }
+      }
+
+      function formatLocationContext(locationObj) {
+        if (!locationObj || !locationObj.label) return '';
+        return locationObj.isApproximate
+          ? locationObj.label + ' (approx.)'
+          : locationObj.label;
+      }
+
+      /* -------------------------------------------------------------------
+         5. PRIVACY-CONSCIOUS LOCATION & WEATHER RESOLUTION
+         Sequence: Manual Override -> Browser Geolocation -> IP Fallback -> Unavailable
+         ------------------------------------------------------------------- */
+      function resolvePreferredTemperatureUnit() {
+        const setting = String(CONFIG.weather.temperatureUnit || 'auto').toLowerCase();
+        if (setting === 'fahrenheit' || setting === 'celsius') {
+          return setting;
+        }
+        try {
+          const lang = (navigator.language || '').toUpperCase();
+          // Regions commonly using Fahrenheit for ambient weather
+          if (
+            lang.endsWith('-US') ||
+            lang.endsWith('-BS') ||
+            lang.endsWith('-KY') ||
+            lang.endsWith('-LR') ||
+            lang.endsWith('-PW') ||
+            lang.endsWith('-FM') ||
+            lang.endsWith('-MH')
+          ) {
+            return 'fahrenheit';
+          }
+        } catch (err) {
+          // Fall back safely to Celsius
+        }
+        return 'celsius';
+      }
+
+      function isValidCoordinatePair(lat, lon) {
+        return (
+          typeof lat === 'number' &&
+          typeof lon === 'number' &&
+          Number.isFinite(lat) &&
+          Number.isFinite(lon) &&
+          lat >= -90 &&
+          lat <= 90 &&
+          lon >= -180 &&
+          lon <= 180
+        );
+      }
+
+      // Reduce coordinate precision to 2 decimal places (~1.1 km) before sending
+      // to the weather provider so exact home/office coordinates are not exposed.
+      function roundCoordForPrivacy(coord) {
+        return Math.round(coord * 100) / 100;
+      }
+
+      async function fetchJsonWithTimeout(url, timeoutMs) {
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timerId = controller
+          ? window.setTimeout(function () { controller.abort(); }, timeoutMs)
+          : null;
+
+        try {
+          const response = await window.fetch(url, {
+            method: 'GET',
+            credentials: 'omit',
+            cache: 'no-store',
+            referrerPolicy: 'no-referrer',
+            signal: controller ? controller.signal : undefined
+          });
+
+          if (!response.ok) {
+            const httpErr = new Error('HTTP ' + response.status);
+            httpErr.status = response.status;
+            throw httpErr;
+          }
+
+          return await response.json();
+        } finally {
+          if (timerId !== null) {
+            window.clearTimeout(timerId);
+          }
+        }
+      }
+
+      function requestBrowserGeolocation() {
+        return new Promise(function (resolve) {
+          if (
+            state.geoPermissionDenied ||
+            state.geoBrowserAttempted ||
+            !('geolocation' in navigator) ||
+            typeof navigator.geolocation.getCurrentPosition !== 'function'
+          ) {
+            resolve(null);
+            return;
+          }
+
+          state.geoBrowserAttempted = true;
+
+          try {
+            navigator.geolocation.getCurrentPosition(
+              function onSuccess(position) {
+                const lat = position && position.coords ? position.coords.latitude : NaN;
+                const lon = position && position.coords ? position.coords.longitude : NaN;
+                if (isValidCoordinatePair(lat, lon)) {
+                  resolve({
+                    latitude: roundCoordForPrivacy(lat),
+                    longitude: roundCoordForPrivacy(lon),
+                    label: 'Local',
+                    isApproximate: false
+                  });
+                } else {
+                  resolve(null);
+                }
+              },
+              function onError(error) {
+                // Code 1 === PERMISSION_DENIED: remember for session to prevent re-prompting
+                if (error && error.code === 1) {
+                  state.geoPermissionDenied = true;
+                }
+                resolve(null);
+              },
+              {
+                enableHighAccuracy: false,
+                timeout: CONFIG.weather.geolocationTimeoutMs,
+                maximumAge: 10 * 60 * 1000
+              }
+            );
+          } catch (err) {
+            resolve(null);
+          }
+        });
+      }
+
+      async function requestApproximateIpLocation() {
+        if (!CONFIG.weather.enableIpFallback || state.isOffline) {
+          return null;
+        }
+
+        try {
+          const data = await fetchJsonWithTimeout(
+            CONFIG.weather.ipGeoEndpoint,
+            CONFIG.weather.requestTimeoutMs
+          );
+
+          if (!data || typeof data !== 'object') return null;
+
+          const lat = Number.parseFloat(data.latitude);
+          const lon = Number.parseFloat(data.longitude);
+          if (!isValidCoordinatePair(lat, lon)) return null;
+
+          const city = typeof data.city === 'string' ? data.city.trim() : '';
+          const region = typeof data.region === 'string' ? data.region.trim() : '';
+          const country = typeof data.country_code === 'string' ? data.country_code.trim() : '';
+
+          let areaLabel = 'Estimated area';
+          if (city && region && city !== region) {
+            areaLabel = city + ', ' + region;
+          } else if (city) {
+            areaLabel = city;
+          } else if (region) {
+            areaLabel = region;
+          } else if (country) {
+            areaLabel = country;
+          }
+
+          return {
+            latitude: roundCoordForPrivacy(lat),
+            longitude: roundCoordForPrivacy(lon),
+            label: areaLabel,
+            isApproximate: true
+          };
+        } catch (err) {
+          return null;
+        }
+      }
+
+      async function resolveLocation() {
+        if (state.resolvedLocation) {
+          return state.resolvedLocation;
+        }
+
+        // Check manual override in CONFIG first
+        const manual = CONFIG.weather.manualLocation;
+        if (manual && isValidCoordinatePair(manual.latitude, manual.longitude)) {
+          state.resolvedLocation = {
+            latitude: roundCoordForPrivacy(manual.latitude),
+            longitude: roundCoordForPrivacy(manual.longitude),
+            label: manual.label ? String(manual.label) : 'Preset location',
+            isApproximate: false
+          };
+          return state.resolvedLocation;
+        }
+
+        // Step 1: Browser Geolocation
+        const browserLoc = await requestBrowserGeolocation();
+        if (browserLoc) {
+          state.resolvedLocation = browserLoc;
+          return state.resolvedLocation;
+        }
+
+        // Abort before external IP call if device went offline meanwhile
+        if (state.isOffline) {
+          return null;
+        }
+
+        // Step 2: Approximate IP Geolocation Fallback
+        const ipLoc = await requestApproximateIpLocation();
+        if (ipLoc) {
+          state.resolvedLocation = ipLoc;
+          return state.resolvedLocation;
+        }
+
+        return null;
+      }
+
+      async function updateWeather(options) {
+        const opts = options || {};
+
+        if (!CONFIG.weather.enabled) {
+          setWeatherPresentation('weather-widget--unavailable', 'Weather disabled', '', '');
+          return;
+        }
+
+        if (state.isOffline) {
+          const cachedCtx = formatLocationContext(state.resolvedLocation);
+          const offlineNote = state.lastWeatherData
+            ? 'Last updated at ' + state.lastWeatherData.updatedText
+            : 'Weather requires an internet connection';
+          setWeatherPresentation(
+            'weather-widget--offline',
+            'Weather offline',
+            cachedCtx,
+            offlineNote
+          );
+          return;
+        }
+
+        if (state.isFetchingWeather) return;
+
+        const nowMs = Date.now();
+        if (!opts.ignoreCooldown && nowMs - state.lastFetchAttemptAt < CONFIG.weather.minRetryCooldownMs) {
+          return;
+        }
+
+        state.isFetchingWeather = true;
+        state.lastFetchAttemptAt = nowMs;
+
+        if (!state.lastWeatherData) {
+          setWeatherPresentation(
+            'weather-widget--loading',
+            'Loading weather\u2026',
+            formatLocationContext(state.resolvedLocation),
+            ''
+          );
+        }
+
+        try {
+          const location = await resolveLocation();
+
+          if (state.isOffline) {
+            setWeatherPresentation(
+              'weather-widget--offline',
+              'Weather offline',
+              formatLocationContext(location),
+              ''
+            );
+            return;
+          }
+
+          // Step 3: Location Unavailable
+          if (!location) {
+            setWeatherPresentation(
+              'weather-widget--location-unavailable',
+              'Location unavailable',
+              '',
+              'Grant browser location permission or configure manualLocation in index.html'
+            );
+            return;
+          }
+
+          const unit = resolvePreferredTemperatureUnit();
+          const unitSymbol = unit === 'fahrenheit' ? '\u00B0F' : '\u00B0C';
+          const params = new URLSearchParams({
+            latitude: String(location.latitude),
+            longitude: String(location.longitude),
+            current: 'temperature_2m,weather_code',
+            temperature_unit: unit
+          });
+
+          const url = CONFIG.weather.weatherEndpoint + '?' + params.toString();
+          const payload = await fetchJsonWithTimeout(url, CONFIG.weather.requestTimeoutMs);
+
+          // Validate response structure defensively
+          if (
+            !payload ||
+            typeof payload !== 'object' ||
+            !payload.current ||
+            typeof payload.current.temperature_2m !== 'number' ||
+            !Number.isFinite(payload.current.temperature_2m)
+          ) {
+            throw new Error('Malformed weather payload');
+          }
+
+          const roundedTemp = Math.round(payload.current.temperature_2m);
+          const rawCode = payload.current.weather_code;
+          const conditionText = Object.prototype.hasOwnProperty.call(WMO_DESCRIPTIONS, rawCode)
+            ? WMO_DESCRIPTIONS[rawCode]
+            : 'Current conditions';
+
+          const updatedStamp = formatClockTime(new Date());
+          state.lastWeatherData = {
+            temp: roundedTemp,
+            unitSymbol: unitSymbol,
+            description: conditionText,
+            updatedText: updatedStamp
+          };
+          state.lastWeatherSuccessAt = Date.now();
+
+          const primaryText = roundedTemp + unitSymbol + ', ' + conditionText;
+          const contextText = formatLocationContext(location);
+          const freshnessTooltip =
+            (location.isApproximate
+              ? 'Approximate IP-estimated area. '
+              : 'Local coordinates. ') +
+            'Updated at ' + updatedStamp;
+
+          setWeatherPresentation(
+            'weather-widget--available',
+            primaryText,
+            contextText,
+            freshnessTooltip
+          );
+        } catch (err) {
+          // State B: Device remains online, only the weather service failed or rate-limited.
+          // Preserve resolved location in memory and display clear explanation without affecting shortcuts.
+          const isRateLimited = err && err.status === 429;
+          const failureLabel = isRateLimited
+            ? 'Weather temporarily rate-limited'
+            : 'Weather service unavailable';
+
+          setWeatherPresentation(
+            'weather-widget--service-unavailable',
+            failureLabel,
+            formatLocationContext(state.resolvedLocation),
+            'Other shortcuts and dashboard features remain available.'
+          );
+        } finally {
+          state.isFetchingWeather = false;
+        }
+      }
+
+      function schedulePeriodicWeatherRefresh() {
+        if (state.weatherTimerId !== null) {
+          window.clearInterval(state.weatherTimerId);
+        }
+        if (!CONFIG.weather.enabled) return;
+
+        state.weatherTimerId = window.setInterval(function () {
+          if (!state.isOffline && document.visibilityState !== 'hidden') {
+            updateWeather();
+          }
+        }, CONFIG.weather.refreshIntervalMs);
+      }
+
+      /* -------------------------------------------------------------------
+         6. CONNECTIVITY DETECTION & SHORTCUT STATE MANAGEMENT
+         Distinguishes browser-reported offline state (State C) from
+         individual service unavailability (State B).
+         ------------------------------------------------------------------- */
+      function isRemoteWebShortcut(anchor) {
+        if (!anchor) return false;
+        const rawHref = (anchor.getAttribute('href') || '').trim();
+        if (!rawHref || rawHref.startsWith('#')) return false;
+
+        try {
+          const parsed = new URL(rawHref, window.location.href);
+          if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+            return false;
+          }
+          // Allow localhost / loopback targets even when WAN reports offline
+          const host = parsed.hostname.toLowerCase();
+          if (host === 'localhost' || host === '127.0.0.1' || host === '[::1]') {
+            return false;
+          }
+          return true;
+        } catch (err) {
+          return false;
+        }
+      }
+
+      function applyShortcutConnectivityState(offline) {
+        if (!dom.shortcutsGrid) return;
+        const cards = dom.shortcutsGrid.querySelectorAll('.shortcut-card');
+
+        cards.forEach(function (card) {
+          if (offline && isRemoteWebShortcut(card)) {
+            card.classList.add('shortcut-card--offline');
+            if (CONFIG.connectivity.preventOfflineRemoteNavigation) {
+              card.setAttribute('aria-disabled', 'true');
+            }
+          } else {
+            card.classList.remove('shortcut-card--offline');
+            card.removeAttribute('aria-disabled');
+          }
+        });
+      }
+
+      function applyConnectivityState(reportedOnline) {
+        const offline = !reportedOnline;
+        state.isOffline = offline;
+
+        if (dom.body) {
+          dom.body.classList.toggle('is-offline', offline);
+          dom.body.classList.toggle('is-online', !offline);
+        }
+
+        if (dom.connectivityBox && dom.connectivityMsg) {
+          dom.connectivityMsg.textContent = CONFIG.connectivity.defaultOfflineMessage;
+          dom.connectivityBox.hidden = !offline;
+          dom.connectivityBox.classList.toggle('connectivity-status--visible', offline);
+        }
+
+        applyShortcutConnectivityState(offline);
+
+        if (offline) {
+          updateWeather({ ignoreCooldown: true });
+        } else {
+          // Restore live weather automatically when connectivity returns if missing or stale
+          const weatherAge = Date.now() - state.lastWeatherSuccessAt;
+          if (!state.lastWeatherData || weatherAge >= CONFIG.weather.refreshIntervalMs) {
+            updateWeather({ ignoreCooldown: true });
+          } else {
+            // Restore normal available presentation from session cache immediately
+            setWeatherPresentation(
+              'weather-widget--available',
+              state.lastWeatherData.temp +
+                state.lastWeatherData.unitSymbol +
+                ', ' +
+                state.lastWeatherData.description,
+              formatLocationContext(state.resolvedLocation),
+              'Updated at ' + state.lastWeatherData.updatedText
+            );
+          }
+        }
+      }
+
+      function handleShortcutClick(event) {
+        if (!state.isOffline || !CONFIG.connectivity.preventOfflineRemoteNavigation) {
+          return;
+        }
+        const target = event.target instanceof Element
+          ? event.target.closest('.shortcut-card')
+          : null;
+
+        if (target && isRemoteWebShortcut(target)) {
+          event.preventDefault();
+          if (dom.connectivityBox && dom.connectivityMsg) {
+            dom.connectivityBox.hidden = false;
+            dom.connectivityBox.classList.add('connectivity-status--visible');
+            dom.connectivityMsg.textContent = CONFIG.connectivity.blockedClickMessage;
+          }
+        }
+      }
+
+      /* -------------------------------------------------------------------
+         7. INITIALIZATION & EVENT LISTENERS
+         ------------------------------------------------------------------- */
+      function init() {
+        if (dom.body) {
+          dom.body.classList.add('js-enabled');
+        }
+
+        // Start local clock & date immediately (no network dependency)
+        scheduleNextClockTick();
+
+        // Intercept futile remote shortcut navigation only when strictly offline
+        if (dom.shortcutsGrid) {
+          dom.shortcutsGrid.addEventListener('click', handleShortcutClick);
+        }
+
+        // Use navigator.onLine as initial connectivity signal
+        const initiallyOnline =
+          typeof navigator.onLine === 'boolean' ? navigator.onLine : true;
+        applyConnectivityState(initiallyOnline);
+
+        // Listen for browser connectivity changes
+        window.addEventListener('offline', function () {
+          applyConnectivityState(false);
+        });
+        window.addEventListener('online', function () {
+          applyConnectivityState(true);
+        });
+
+        // Keep clock accurate and refresh stale weather when waking a backgrounded tab
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'visible') {
+            scheduleNextClockTick();
+            if (
+              !state.isOffline &&
+              CONFIG.weather.enabled &&
+              Date.now() - state.lastWeatherSuccessAt >= CONFIG.weather.refreshIntervalMs
+            ) {
+              updateWeather();
+            }
+          }
+        });
+
+        // Schedule restrained background refresh while tab remains open
+        schedulePeriodicWeatherRefresh();
+      }
+
+      // Run immediately since script is placed at the end of <body>
+      try {
+        init();
+      } catch (err) {
+        // Fail gracefully: static HTML layout, greeting, and shortcut links remain intact
+      }
+    })();
+  </script>
+</body>
+</html>
